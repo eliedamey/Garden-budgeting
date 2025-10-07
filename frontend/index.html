@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🌱 Garden Budgeting — Frontend MVP</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🌱 Garden Budgeting <span class="sub">— buckets, rewards, and a growing garden</span></h1>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="buckets">Buckets</button>
+      <button class="tab-btn" data-tab="transactions">Transactions</button>
+      <button class="tab-btn" data-tab="garden">Garden</button>
+      <button class="tab-btn" data-tab="settings">Settings</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="grid">
+      <div class="col-12 card">
+        <div class="row space-between">
+          <div>
+            <div class="badge">Current Month</div>
+            <h2 style="margin:6px 0 0" id="monthLabel">—</h2>
+            <div class="hint">Use Settings → Close Month to award points & reset spending.</div>
+          </div>
+          <div class="row" style="gap:6px">
+            <div class="badge">Total Spent: <span id="sumSpent" class="mono">$0.00</span></div>
+            <div class="badge">Total Saved: <span id="sumSaved" class="mono">$0.00</span></div>
+            <div class="badge">Reserve: <span id="reserveBal" class="mono">$0.00</span></div>
+            <div class="badge">Points: <span id="pointsBal" class="mono">0</span></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="grid">
+          <div class="col-6">
+            <h3>Spending Buckets</h3>
+            <div id="dashSpending" class="list"></div>
+          </div>
+          <div class="col-6">
+            <h3>Savings Buckets</h3>
+            <div id="dashSavings" class="list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUCKETS -->
+    <section id="tab-buckets" class="grid" style="display:none">
+      <div class="col-4 card">
+        <h3>Create Bucket</h3>
+        <label>Name</label>
+        <input id="bkName" placeholder="Food, Entertainment, Emergency Fund" />
+        <label>Type</label>
+        <select id="bkType">
+          <option value="spending">Spending</option>
+          <option value="savings">Savings</option>
+          <option value="reserve">Reserve</option>
+        </select>
+        <div id="bkLimitWrap">
+          <label>Monthly Limit ($)</label>
+          <input id="bkLimit" type="number" min="0" step="1" placeholder="250" />
+        </div>
+        <div id="bkGoalWrap" style="display:none">
+          <label>Goal ($)</label>
+          <input id="bkGoal" type="number" min="0" step="1" placeholder="1000" />
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="bkCreate">Add Bucket</button>
+          <button class="btn secondary" id="bkSeed">Seed Demo</button>
+        </div>
+        <p class="hint">Reserve is your safety net when a spending bucket goes over.</p>
+      </div>
+      <div class="col-8 card">
+        <h3>All Buckets</h3>
+        <div id="bkList" class="list"></div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section id="tab-transactions" class="grid" style="display:none">
+      <div class="col-4 card">
+        <h3>Add Transaction</h3>
+        <label>Merchant</label>
+        <input id="txMerchant" placeholder="Chipotle, Netflix, Paycheck" />
+        <label>Amount ($)</label>
+        <input id="txAmount" type="number" min="0" step="0.01" placeholder="12.50" />
+        <label>Bucket</label>
+        <select id="txBucket"></select>
+        <label>Date</label>
+        <input id="txDate" type="date" />
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="txAdd">Add</button>
+          <button class="btn secondary" id="txClear">Clear</button>
+        </div>
+        <p class="hint">Savings transactions increase your saved total. Spending increases spent this month.</p>
+      </div>
+      <div class="col-8 card">
+        <div class="row space-between">
+          <h3>Recent Transactions</h3>
+          <div class="row">
+            <select id="txFilterBucket"></select>
+            <button class="btn secondary" id="txFilterReset">Reset Filter</button>
+          </div>
+        </div>
+        <div id="txList" class="list"></div>
+      </div>
+    </section>
+
+    <!-- GARDEN -->
+    <section id="tab-garden" class="grid" style="display:none">
+      <div class="col-12 card">
+        <div class="row space-between">
+          <h3>Your Garden</h3>
+          <div class="badge">Total Points: <span id="gdPoints" class="mono">0</span></div>
+        </div>
+        <div class="grid" id="gardenGrid"></div>
+        <div class="divider"></div>
+        <p class="hint">Plants grow with points from budget discipline (spending leftover tiers) and savings milestones (25/50/75/100%).</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="tab-settings" class="grid" style="display:none">
+      <div class="col-6 card">
+        <h3>Month & Points</h3>
+        <p class="hint">Close the month to award points, pull from reserve if over budget, and reset spending totals. Savings and transactions remain.</p>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="closeMonth">Close Month & Award Points</button>
+          <button class="btn secondary" id="wipeData">Wipe All Data</button>
+        </div>
+        <div class="divider"></div>
+        <div class="row" style="gap:6px">
+          <div class="badge">Current Month: <span id="stMonth" class="mono">—</span></div>
+          <div class="badge">Points: <span id="stPoints" class="mono">0</span></div>
+        </div>
+      </div>
+      <div class="col-6 card">
+        <h3>About</h3>
+        <p>This is a frontend-only MVP: data persists to <span class="mono">localStorage</span>. No backend or real bank connections.</p>
+        <ul>
+          <li>Spending buckets: have <strong>monthlyLimit</strong> and <strong>spentThisMonth</strong>.</li>
+          <li>Savings buckets: have <strong>goal</strong> and <strong>savedTotal</strong>.</li>
+          <li>Reserve bucket: safety net used when overspending occurs.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
