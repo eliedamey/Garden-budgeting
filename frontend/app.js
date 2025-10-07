@@ -301,16 +301,34 @@ txAdd.addEventListener('click', () => {
   const b = bucketById(bucketId);
   if (!b) return alert('Bucket missing.');
 
+  // Apply the transaction to the target pot
   if (b.type === 'spending') {
     b.spentThisMonth = Number(b.spentThisMonth||0) + amount;
   } else if (b.type === 'savings' || b.type === 'reserve') {
     b.savedTotal = Number(b.savedTotal||0) + amount;
   }
 
-  state.transactions.push({ id:newId(), merchant, amount, bucketId, occurredAtISO: new Date(dateISO).toISOString() });
-  txMerchant.value=''; txAmount.value='';
-  save(); renderAll();
+  // Record the transaction
+  state.transactions.push({
+    id: newId(),
+    merchant,
+    amount,
+    bucketId,
+    occurredAtISO: new Date(dateISO).toISOString()
+  });
+
+  // NEW: award 1 point for engaging with the app (adding a transaction)
+  state.points = Number(state.points || 0) + 1;
+
+  // Clear inputs and refresh
+  txMerchant.value = '';
+  txAmount.value = '';
+  save();
+  renderAll();
+  // (optional) quick feedback
+  // alert('+1 point!');
 });
+
 txClear.addEventListener('click', () => { txMerchant.value=''; txAmount.value=''; });
 txFilterBucket.addEventListener('change', renderTx);
 txFilterReset.addEventListener('click', () => { txFilterBucket.value=''; renderTx(); });
