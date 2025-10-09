@@ -1,156 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🌱 Garden Budgeting — Frontend MVP</title>
+  <title>Garden Budgeting</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header>
-    <h1>🌱 Garden Budgeting <span class="sub">— buckets, rewards, and a growing garden</span></h1>
-    <nav class="tabs">
-      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
-      <button class="tab-btn" data-tab="buckets">Buckets</button>
-      <button class="tab-btn" data-tab="transactions">Transactions</button>
-      <button class="tab-btn" data-tab="garden">Garden</button>
-      <button class="tab-btn" data-tab="settings">Settings</button>
+  <aside class="sidebar">
+    <div class="brand">🌱</div>
+    <nav class="side-nav">
+      <button class="side-link active" data-tab="dashboard" title="Home">🏠</button>
+      <button class="side-link" data-tab="pots" title="Pots">🪴</button>
+      <button class="side-link" data-tab="transactions" title="Transactions">🧾</button>
+      <button class="side-link" data-tab="garden" title="Garden">🌳</button>
+      <button class="side-link" data-tab="reports" title="Reports">📊</button>
+      <button class="side-link" data-tab="settings" title="Settings">⚙️</button>
     </nav>
-  </header>
+    <div class="side-footer">ⓘ</div>
+  </aside>
 
-  <main>
-    <!-- DASHBOARD -->
-    <section id="tab-dashboard" class="grid">
-      <div class="col-12 card">
-        <div class="row space-between">
-          <div>
-            <div class="badge">Current Month</div>
-            <h2 style="margin:6px 0 0" id="monthLabel">—</h2>
-            <div class="hint">Use Settings → Close Month to award points & reset spending.</div>
-          </div>
-          <div class="row" style="gap:6px">
-            <div class="badge">Total Spent: <span id="sumSpent" class="mono">$0.00</span></div>
-            <div class="badge">Total Saved: <span id="sumSaved" class="mono">$0.00</span></div>
-            <div class="badge">Reserve: <span id="reserveBal" class="mono">$0.00</span></div>
-            <div class="badge">Points: <span id="pointsBal" class="mono">0</span></div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div class="grid">
-          <div class="col-6">
-            <h3>Spending Buckets</h3>
-            <div id="dashSpending" class="list"></div>
-          </div>
-          <div class="col-6">
-            <h3>Savings Buckets</h3>
-            <div id="dashSavings" class="list"></div>
-          </div>
-        </div>
+  <div class="shell">
+    <header class="topbar">
+      <div class="search">
+        <input id="searchInput" placeholder="Search transactions or pots…" />
       </div>
-    </section>
+      <div class="top-actions">
+        <div class="pill">🌟 <span id="pointsTop">0</span></div>
+        <button class="btn primary" id="quickAddBtn">+ Add funds / transaction</button>
+        <div class="avatar" title="You">🙂</div>
+      </div>
+    </header>
 
-    <!-- BUCKETS -->
-    <section id="tab-buckets" class="grid" style="display:none">
-      <div class="col-4 card">
-        <h3>Create Bucket</h3>
-        <label>Name</label>
-        <input id="bkName" placeholder="Food, Entertainment, Emergency Fund" />
-        <label>Type</label>
-        <select id="bkType">
-          <option value="spending">Spending</option>
-          <option value="savings">Savings</option>
-          <option value="reserve">Reserve</option>
-        </select>
-        <div id="bkLimitWrap">
-          <label>Monthly Limit ($)</label>
-          <input id="bkLimit" type="number" min="0" step="1" placeholder="250" />
-        </div>
-        <div id="bkGoalWrap" style="display:none">
-          <label>Goal ($)</label>
-          <input id="bkGoal" type="number" min="0" step="1" placeholder="1000" />
-        </div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" id="bkCreate">Add Bucket</button>
-          <button class="btn secondary" id="bkSeed">Seed Demo</button>
-        </div>
-        <p class="hint">Reserve is your safety net when a spending bucket goes over.</p>
-      </div>
-      <div class="col-8 card">
-        <h3>All Buckets</h3>
-        <div id="bkList" class="list"></div>
-      </div>
-    </section>
-
-    <!-- TRANSACTIONS -->
-    <section id="tab-transactions" class="grid" style="display:none">
-      <div class="col-4 card">
-        <h3>Add Transaction</h3>
-        <label>Merchant</label>
-        <input id="txMerchant" placeholder="Chipotle, Netflix, Paycheck" />
-        <label>Amount ($)</label>
-        <input id="txAmount" type="number" min="0" step="0.01" placeholder="12.50" />
-        <label>Bucket</label>
-        <select id="txBucket"></select>
-        <label>Date</label>
-        <input id="txDate" type="date" />
-        <div class="row" style="margin-top:8px">
-          <button class="btn" id="txAdd">Add</button>
-          <button class="btn secondary" id="txClear">Clear</button>
-        </div>
-        <p class="hint">Savings transactions increase your saved total. Spending increases spent this month.</p>
-      </div>
-      <div class="col-8 card">
-        <div class="row space-between">
-          <h3>Recent Transactions</h3>
-          <div class="row">
-            <select id="txFilterBucket"></select>
-            <button class="btn secondary" id="txFilterReset">Reset Filter</button>
+    <main class="page">
+      <!-- DASHBOARD -->
+      <section id="tab-dashboard" class="grid">
+        <!-- TOTAL + MINI CARDS -->
+        <div class="card col-6">
+          <div class="row space-between">
+            <div>
+              <div class="muted">Your total balance</div>
+              <div class="big" id="totalBalance">$0.00</div>
+              <div class="tiny-row">
+                <span class="tiny up">+ <span id="todayIncome">$0.00</span> Today</span>
+                <span class="tiny down">− <span id="todaySpent">$0.00</span> Today</span>
+              </div>
+            </div>
+            <div class="right-cards">
+              <div class="mini-card gradient-blue">
+                <div class="mc-title">Income (monthly)</div>
+                <div class="mc-amt" id="incomeMonthly">$0.00</div>
+                <div class="mc-sub">&nbsp;</div>
+              </div>
+              <div class="mini-card gradient-green">
+                <div class="mc-title">Unassigned</div>
+                <div class="mc-amt" id="leftDisplay">$0.00</div>
+                <div class="bar"><div id="assignBar" class="bar-fill" style="width:0%"></div></div>
+                <div id="unassignedNote" class="chip mt-6"></div>
+              </div>
+            </div>
           </div>
         </div>
-        <div id="txList" class="list"></div>
-      </div>
-    </section>
 
-    <!-- GARDEN -->
-    <section id="tab-garden" class="grid" style="display:none">
-      <div class="col-12 card">
-        <div class="row space-between">
-          <h3>Your Garden</h3>
-          <div class="badge">Total Points: <span id="gdPoints" class="mono">0</span></div>
+        <!-- WALLET / INCOME INPUT -->
+        <div class="card col-3 illustration">
+          <div class="illus-wallet">🪪💸</div>
+          <button class="btn secondary full" id="setIncomeOpen">+ Set income</button>
+          <div class="row mt">
+            <input id="incomeInput" type="number" min="0" step="1" placeholder="Monthly income…" />
+            <button class="btn" id="setIncome">Set</button>
+          </div>
         </div>
-        <div class="grid" id="gardenGrid"></div>
-        <div class="divider"></div>
-        <p class="hint">Plants grow with points from budget discipline (spending leftover tiers) and savings milestones (25/50/75/100%).</p>
-      </div>
-    </section>
 
-    <!-- SETTINGS -->
-    <section id="tab-settings" class="grid" style="display:none">
-      <div class="col-6 card">
-        <h3>Month & Points</h3>
-        <p class="hint">Close the month to award points, pull from reserve if over budget, and reset spending totals. Savings and transactions remain.</p>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" id="closeMonth">Close Month & Award Points</button>
-          <button class="btn secondary" id="wipeData">Wipe All Data</button>
+        <!-- ALERTS -->
+        <div class="card col-3">
+          <div class="row space-between">
+            <div class="muted">Today</div>
+            <div class="muted" id="todayLabel"></div>
+          </div>
+          <div class="list" id="alerts"></div>
         </div>
-        <div class="divider"></div>
-        <div class="row" style="gap:6px">
-          <div class="badge">Current Month: <span id="stMonth" class="mono">—</span></div>
-          <div class="badge">Points: <span id="stPoints" class="mono">0</span></div>
+
+        <!-- ACTIVITIES / TXNS -->
+        <div class="col-12"><h3>Activities</h3></div>
+        <div class="card col-8">
+          <div class="muted">Spending this week (placeholder chart)</div>
+          <div class="chart-placeholder">— chart coming soon —</div>
         </div>
-      </div>
-      <div class="col-6 card">
-        <h3>About</h3>
-        <p>This is a frontend-only MVP: data persists to <span class="mono">localStorage</span>. No backend or real bank connections.</p>
-        <ul>
-          <li>Spending buckets: have <strong>monthlyLimit</strong> and <strong>spentThisMonth</strong>.</li>
-          <li>Savings buckets: have <strong>goal</strong> and <strong>savedTotal</strong>.</li>
-          <li>Reserve bucket: safety net used when overspending occurs.</li>
-        </ul>
-      </div>
-    </section>
-  </main>
+        <div class="card col-4">
+          <div class="row space-between">
+            <h3>My Transactions</h3>
+            <button class="btn ghost small" data-tab-jump="transactions">See all</button>
+          </div>
+          <div id="dashTxList" class="list"></div>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div class="col-12"><h3>Categories</h3></div>
+        <div id="dashboardPots" class="grid"></div>
+      </section>
+
+      <!-- POTS -->
+      <section id="tab-pots" class="grid" style="display:none">
+        <div class="card col-4">
+          <h2>Create Pot</h2>
+          <label>Name</label>
+          <input id="potName" placeholder="Food, Rent, S&P 500…" />
+          <label>Type</label>
+          <select id="potType">
+            <option value="spending">Spending</option>
+            <option value="savings">Savings</option>
+            <option value="investment">Investment</option>
+            <option value="reserve">Reserve</option>
+          </select>
+          <div id="spendingWrap">
+            <label>Monthly Limit ($)</label>
+            <input id="spendingLimit" type="number" min="0" step="1" />
+          </div>
+          <div id="contribWrap" style="display:none">
+            <label>Monthly Contribution ($)</label>
+            <input id="monthlyContrib" type="number" min="0" step="1" />
+          </div>
+          <div id="goalWrap" style="display:none">
+            <label>Goal ($)</label>
+            <input id="goalInput" type="number" min="0" step="1" />
+          </div>
+          <button class="btn primary mt" id="createPot">Add Pot</button>
+          <button class="btn ghost mt" id="seedDemo">Seed Demo</button>
+        </div>
+
+        <div class="card col-8">
+          <h2>All Pots</h2>
+          <div id="potList" class="list"></div>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section id="tab-transactions" class="grid" style="display:none">
+        <div class="card col-4">
+          <h2>Add Transaction</h2>
+          <label>Merchant / Note</label>
+          <input id="txMerchant" />
+          <label>Amount ($)</label>
+          <input id="txAmount" type="number" step="0.01" min="0" />
+          <label>Pot</label>
+          <select id="txPot"></select>
+          <label>Date</label>
+          <input id="txDate" type="date" />
+          <div class="row mt">
+            <button class="btn primary" id="txAdd">Add</button>
+            <button class="btn ghost" id="txClear">Clear</button>
+          </div>
+        </div>
+
+        <div class="card col-8">
+          <div class="row space-between">
+            <h2>History</h2>
+            <div class="row">
+              <select id="txFilterPot"></select>
+              <button class="btn ghost" id="txFilterReset">Reset</button>
+            </div>
+          </div>
+          <div id="txList" class="list"></div>
+        </div>
+      </section>
+
+      <!-- GARDEN -->
+      <section id="tab-garden" class="grid" style="display:none">
+        <div class="card col-12">
+          <div class="row space-between">
+            <h2>Your Garden</h2>
+            <div class="pill">🌟 <span id="pointsGarden">0</span></div>
+          </div>
+          <div id="gardenGrid" class="grid"></div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="tab-reports" class="grid" style="display:none">
+        <div class="card col-6">
+          <h2>Allocation (planned)</h2>
+          <div id="allocPlanned" class="list"></div>
+        </div>
+        <div class="card col-6">
+          <h2>Balances & progress</h2>
+          <div id="allocProgress" class="list"></div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="tab-settings" class="grid" style="display:none">
+        <div class="card col-6">
+          <h2>Month & Rewards</h2>
+          <p class="muted">Close month to award points and reset spending.</p>
+          <div class="row mt">
+            <button class="btn primary" id="closeMonth">Close Month & Award Points</button>
+            <button class="btn ghost" id="wipeData">Wipe All Data</button>
+          </div>
+          <div class="row mt">
+            <div class="pill">Month start: <span id="monthStartBadge">—</span></div>
+            <div class="pill">Points: <span id="pointsSettings">0</span></div>
+          </div>
+        </div>
+        <div class="card col-6">
+          <h2>About</h2>
+          <ul class="bullets">
+            <li>All data saves locally in your browser.</li>
+            <li>Pots: Spending, Savings, Investment, Reserve.</li>
+            <li>Income → Assigned → Leftover.</li>
+            <li>Garden grows with points.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script src="./app.js"></script>
 </body>
 </html>
+
